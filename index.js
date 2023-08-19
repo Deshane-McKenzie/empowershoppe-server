@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors')
 const app = express();
 require('dotenv').config();
+const productRoute = require('./routes/product-details');
+const activeProductRoute = require('./routes/product-details');
 
 /*
 * The port the server should listen to allow routing to work 
@@ -20,6 +22,10 @@ app.use(express.json());
 
 // middleware used to access public folder for images - allowing for load of route file
 app.use(express.static('public'));
+
+// middleware used to load route files x3
+app.use('/product', productRoute);
+app.use('/product/:id', activeProductRoute)
 
 //listening for the port to use to start the server
 app.listen(PORT, () => (
