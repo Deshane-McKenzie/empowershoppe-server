@@ -2,8 +2,8 @@ const express = require('express');
 const cors = require('cors')
 const app = express();
 require('dotenv').config();
-const productRoute = require('./routes/product-details');
-const activeProductRoute = require('./routes/product-details');
+const productRoute = require('./routes/products');
+const activeProductRoute = require('./routes/products');
 
 /*
 * The port the server should listen to allow routing to work 
