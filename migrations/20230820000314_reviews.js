@@ -9,7 +9,7 @@ exports.up = function(knex) {
         table.integer('user_id').unsigned();
         table.text('review_text');
         table.tinyint('star_rating').unsigned();
-        table.date('review_date');
+        table.date('review_date').toISOString().split('T')[0];
         
         table.foreign('product_id').references('Products.product_id');
         table.foreign('user_id').references('Users.user_id');

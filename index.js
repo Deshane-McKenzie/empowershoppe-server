@@ -1,9 +1,10 @@
 const express = require('express');
-const cors = require('cors')
+const cors = require('cors');
 const app = express();
 require('dotenv').config();
 const productRoute = require('./routes/products');
 const activeProductRoute = require('./routes/products');
+const reviewRoute = require('./routes/reviews');
 
 /*
 * The port the server should listen to allow routing to work 
@@ -24,8 +25,11 @@ app.use(express.json());
 app.use(express.static('public'));
 
 // middleware used to load route files x3
+
 app.use('/product', productRoute);
-app.use('/product/:id', activeProductRoute)
+app.use('/:product_id/reviews', reviewRoute);
+// app.use('/product/reviews', reviewRoute);
+
 
 //listening for the port to use to start the server
 app.listen(PORT, () => (
