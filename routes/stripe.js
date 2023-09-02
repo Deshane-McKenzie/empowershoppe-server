@@ -1,95 +1,106 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const express = require('express');
 const router = express.Router();
+const knex = require('knex')(require('../knexfile'));
 
 
-// router.post('/payment', (req, res) => {
-//     const { amount, currency } = req.body;
+router.post('/payment', async (req, res) => {
+    const {
+        billingName,
+        billingAddress,
+        shippingName,
+        shippingAddress,
+        token,
+        product_id,
+        quantity,
+        total_amount,
+        order_date, // Adding order_date in (YYYY-MM-DD format)
 
-//     // Create a payment session
-//     stripe.checkout.sessions.create(
-//         {
-//             payment_method_types: ['card'],
-//             line_items: [
-//                 {
-//                     price_data: {
-//                         currency,
-//                         product_data: {
-//                             name: 'Your Product',
-//                         },
-//                         unit_amount: amount,
-//                     },
-//                     quantity: 1,
-//                 },
-//             ],
-//             mode: 'payment',
-//             success_url: 'http://your-website.com/success',
-//             cancel_url: 'http://your-website.com/cancel',
-//         },
-//         (err, session) => {
-//             if (err) {
-//                 res.status(500).json({ error: 'An error occurred.' });
-//             } else {
-//                 res.status(200).json({ sessionId: session.id });
-//             }
-//         }
-//     );
-// });
+    } = req.body;
 
-
-// router.post('/create-payment-session', (req, res) => {
-//     const { billingDetails, shippingDetails, cartItems, totalAmount } = req.body;
-
-//     // Create a payment session
-//     stripe.checkout.sessions.create({
-//         payment_method_types: ['card'],
-//         line_items: [
-//             /* Format your line items based on cartItems */
-//         ],
-//         /* Set success and cancel URLs */
-//     })
-//     .then(session => {
-//         res.json({ sessionId: session.id });
-//     })
-//     .catch(error => {
-//         console.error('Error creating payment session:', error);
-//         res.status(500).json({ error: 'An error occurred.' });
-//     });
-// });
-
-router.post("/payment", async (req, res) => {
-    let {amount, id} = req.body
     try {
-        const payment = await Stripe.PaymentIntentsResource.create({
-            amount,
-            currency: "CAD",
-            description: "EmpowerShoppe",
-            payment_method: id,
-            confirm: true
-        })
-        console.log("Payment", payment)
-        res.json({
-            message: "Payment Successful!",
-            success: true
-        })
+        const charge = await stripe.charges.create({
+            amount: total_amount,
+            currency: 'cad',
+            source: token,
+            description: 'EmpowerShoppe transaction',
+        });
+
+        if (charge.status === 'succeeded') { // Check if charge is successful
+            // Insert or retrieve user_id based on billingName
+            const [existingUser] = await knex('Users').select('user_id').where({
+                first_name: billingName.first_name,
+                last_name: billingName.last_name,
+            });
+
+            const user_id = existingUser ? existingUser.user_id : await knex('Users').insert({
+                first_name: billingName.first_name,
+                last_name: billingName.last_name,
+                email: billingName.email,
+                phone_number: billingName.phone_number,
+            });
+
+            // Check if shippingName is different from billingName
+            if (shippingName.first_name !== billingName.first_name || shippingName.last_name !== billingName.last_name) {
+                // Insert shipping user information into the Users table (if different)
+                await knex('Users').insert({
+                    user_id: user_id,
+                    first_name: shippingName.first_name,
+                    last_name: shippingName.last_name,
+                    email: shippingName.email,
+                    phone_number: shippingName.phone_number,
+                });
+            }
+
+            // Insert billing and shipping addresses
+            const billingId = await knex('Addresses').insert({
+                user_id: user_id,
+                address_type: 'billing',
+                street: billingAddress.street,
+                suite: billingAddress.suite,
+                city: billingAddress.city,
+                province: billingAddress.province,
+                country: billingAddress.country,
+                postal_code: billingAddress.postal_code,
+            });
+
+            const shippingId = await knex('Addresses').insert({
+                user_id: user_id,
+                address_type: 'shipping',
+                street: shippingAddress.street,
+                suite: shippingAddress.suite,
+                city: shippingAddress.city,
+                province: shippingAddress.province,
+                country: shippingAddress.country,
+                postal_code: shippingAddress.postal_code,
+            });
+
+            // Insert order and order items
+            const orderId = await knex('Orders').insert({
+                user_id: user_id,
+                order_date: order_date,
+                payment_method: 'credit_card',
+                shipping_method: 'standard',
+                billing_address_id: billingId[0],
+                shipping_address_id: shippingId[0],
+                total_amount: total_amount,
+            });
+
+            const orderItemId = await knex('Order_Items').insert({
+                order_id: orderId[0],
+                product_id: product_id,
+                quantity: quantity,
+            });
+
+            res.status(200).json({ message: 'Payment successful' });
+        } else {
+            res.status(400).json({ message: 'Payment not successful' });
+        }
     } catch (error) {
-        console.log("Error", error)
-        res.json({
-            message: "Payment Unsuccessful",
-            success: false
-        })
+        console.error(error);
+        res.status(500).json({ message: 'Payment failed' });
     }
-})
-
-// // Set up webhook endpoint to handle payment confirmation event
-// router.post('/webhook', (req, res) => {
-//     const event = req.body;
-
-//     // Handle the webhook event (e.g., update database)
-//     // Make sure to handle different types of events (payment.success, etc.)
-
-//     res.status(200).end();
-// });
+});
 
 
 module.exports = router;

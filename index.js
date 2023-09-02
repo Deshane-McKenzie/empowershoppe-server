@@ -4,10 +4,8 @@ const app = express();
 require('dotenv').config();
 const paymentRoute = require('./routes/stripe');
 const productRoute = require('./routes/products');
-const activeProductRoute = require('./routes/products');
 const reviewRoute = require('./routes/reviews');
-const { default: Stripe } = require('stripe');
-const bodyParser = require('body-parser');
+
 
 /*
 * The port the server should listen to allow routing to work 
@@ -21,8 +19,6 @@ const PORT = process.env.PORT || 8080;
 */
 app.use(cors());
 
-app.use(bodyParser.json()); // Parse JSON body
-
 // middleware used to have req.body work
 app.use(express.json());
 
@@ -33,9 +29,6 @@ app.use(express.static('public'));
 app.use('/api', paymentRoute);
 app.use('/product', productRoute);
 app.use('/reviews', reviewRoute);
-// app.use('/product/reviews', reviewRoute);
-
-
 
 
 //listening for the port to use to start the server
