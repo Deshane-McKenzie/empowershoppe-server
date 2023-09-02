@@ -3,6 +3,27 @@ const router = express.Router();
 const knex = require('knex')(require('../knexfile'));
 
 
+// GET user details by user_id
+router.get('/users/:user_id', (req, res) => {
+    const userId = req.params.user_id;
+
+    knex
+        .select('user_id', 'first_name', 'last_name')
+        .from('Users')
+        .where({ user_id: userId })
+        .then((userData) => {
+            if (!userData.length) {
+                return res.status(404).json({ message: "User id not found!" });
+            }
+            
+            res.status(200).json(userData[0]);
+        })
+        .catch((err) => {
+            res.status(500).send(`Error getting user with id:${userId}`);
+        });
+});
+
+
 
 // Allows for All information from the Products database to be pulled so it can show on the webpage - GET Request
 router.get('/', (_req, res) => {
@@ -36,7 +57,7 @@ router.get('/:product_id', (req, res) => {
             }
 
             knex
-                .select('review_id', 'user_id', 'review_text', 'star_rating', 'review_date')
+                .select('review_id', 'user_id', 'first_name','last_name', 'review_text', 'star_rating', 'review_date')
                 .from('Reviews')
                 .where({ product_id: productId })
                 .then((reviewData) => {

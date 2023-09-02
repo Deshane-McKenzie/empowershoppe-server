@@ -4,13 +4,13 @@ const knex = require('knex')(require('../knexfile'));
 
 const bodyParser = require('body-parser');
 const app = express();
-app.use(bodyParser.json()); // Parse JSON body
+app.use(bodyParser.json());
 
 
 // List all reviews
 router.get('/', (req, res) => {
     knex
-        .select('review_id', 'product_id', 'user_id', 'review_text', 'star_rating', 'review_date')
+        .select('review_id', 'product_id', 'first_name', 'last_name', 'user_id', 'review_text', 'star_rating', 'review_date')
         .from('Reviews')
         .then((reviewData) => {
             res.status(200).json(reviewData);
@@ -19,6 +19,37 @@ router.get('/', (req, res) => {
             res.status(500).send(`Error getting reviews: ${err}`);
         });
 });
+
+
+// Post a review
+router.post('/', (req, res) => {
+    const {
+      product_id,
+      first_name,
+      last_name,
+      review_text,
+      star_rating,
+      review_date,
+    } = req.body;
+  
+    knex('reviews')
+      .insert({
+        product_id,
+        first_name,
+        last_name,
+        review_text,
+        star_rating,
+        review_date,
+      })
+      .then(() => {
+        console.log('Review added');
+        res.status(201).json({ message: 'Review submitted successfully' });
+      })
+      .catch((err) => {
+        console.error('Error adding review:', err);
+        res.status(500).json({ error: 'Failed to add review' });
+      });
+  });
 
 
 // Edit a review
@@ -62,7 +93,7 @@ router.get('/:review_id', (req, res) => {
     const reviewId = req.params.review_id;
 
     knex
-        .select('review_id', 'product_id', 'user_id', 'review_text', 'star_rating', 'review_date')
+        .select('review_id', 'product_id', 'user_id', 'first_name', 'last_name', 'review_text', 'star_rating', 'review_date')
         .from('Reviews')
         .where({ review_id: reviewId })
         .then((reviewData) => {
@@ -75,5 +106,6 @@ router.get('/:review_id', (req, res) => {
             res.status(500).send(`Error getting review with id:${reviewId}`);
         });
 });
+
 
 module.exports = router;
