@@ -190,11 +190,6 @@ To run this project, you will need to add the following environment variables to
 | N/A      | N/A | Posts to Stripe, then database once payment is successful |
 
 
-## Screenshots
-
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
-
-
 ## Lessons Learned
 
 1 - Know what things are called
