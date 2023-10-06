@@ -56,9 +56,6 @@ router.post('/', (req, res) => {
 router.put('/:review_id', (req, res) => {
     const reviewId = req.params.review_id;
     const { review_text, star_rating } = req.body;
-    console.log(req.body);
-    console.log(req.body.review_text);
-    console.log(req.body.star_rating)
 
     knex('Reviews')
         .where({ review_id: reviewId })
