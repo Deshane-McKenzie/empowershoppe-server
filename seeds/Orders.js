@@ -1,0 +1,32 @@
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> } 
+ */
+exports.seed = async function(knex) {
+  // Deletes ALL existing entries
+  await knex('table_name').del()
+  await knex('table_name').insert([
+    {
+      order_id: 1,
+      user_id: null,
+      order_date: null,
+      payment_method: 'credit_card',
+      shipping_method: 'standard',
+      billing_address_id: 1,
+      shipping_address_id: 2,
+      total_amount: 20.00,
+      order_status: 0,
+    },
+    {
+      order_id: 2,
+      user_id: 27,
+      order_date: null,
+      payment_method: 'credit_card',
+      shipping_method: 'standard',
+      billing_address_id: 3,
+      shipping_address_id: 4,
+      total_amount: 20.00,
+      order_status: 0,
+    }
+  ]);
+};
