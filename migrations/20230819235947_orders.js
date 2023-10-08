@@ -3,6 +3,8 @@
  * @returns { Promise<void> }
  */
 exports.up = function(knex) {
+    return knex.schema.dropTableIfExists('Orders')
+        .then(() => {
     return knex.schema.createTable('Orders', table => {
         table.increments('order_id').primary();
         table.integer('user_id').unsigned().references('user_id').inTable('Users');
@@ -13,6 +15,7 @@ exports.up = function(knex) {
         table.integer('shipping_address_id').unsigned().references('address_id').inTable('Addresses');
         table.decimal('total_amount', 10, 2);
     });
+})
 };
 
 /**
@@ -20,5 +23,5 @@ exports.up = function(knex) {
  * @returns { Promise<void> }
  */
 exports.down = function(knex) {
-    return knex.schema.dropTable('Orders');
-};
+    return knex.schema.dropTable('Orders')
+}
