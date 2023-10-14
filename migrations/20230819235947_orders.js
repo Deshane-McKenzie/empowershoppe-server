@@ -14,6 +14,7 @@ exports.up = function(knex) {
         table.integer('billing_address_id').unsigned().references('address_id').inTable('Addresses');
         table.integer('shipping_address_id').unsigned().references('address_id').inTable('Addresses');
         table.decimal('total_amount', 10, 2);
+        table.integer('order_status').unsigned();
     });
 })
 };

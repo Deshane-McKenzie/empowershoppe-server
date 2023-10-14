@@ -143,7 +143,7 @@ router.post('/payment', async (req, res) => {
                 },
             ],
             mode: 'payment',
-            success_url: `http://localhost:8000/api/payment/success?billing_id=${billingId}&shipping_id=${shippingId}&order_id=${orderId}&order_item_id=${orderItemId}`,
+            success_url: `${process.env.BACKEND_URL}/api/payment/success?billing_id=${billingId}&shipping_id=${shippingId}&order_id=${orderId}&order_item_id=${orderItemId}`,
         });
 
         console.log(session.url);

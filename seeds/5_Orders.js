@@ -15,6 +15,7 @@ exports.seed = async function(knex) {
       billing_address_id: 1,
       shipping_address_id: 2,
       total_amount: 20.00,
+      order_status: 0,
     },
     {
       order_id: 2,
@@ -25,6 +26,7 @@ exports.seed = async function(knex) {
       billing_address_id: 3,
       shipping_address_id: 4,
       total_amount: 20.00,
+      order_status: 0,
     }
   ]);
 };
