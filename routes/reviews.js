@@ -32,7 +32,7 @@ router.post('/', (req, res) => {
       review_date,
     } = req.body;
   
-    knex('reviews')
+    knex('Reviews')
       .insert({
         product_id,
         first_name,
