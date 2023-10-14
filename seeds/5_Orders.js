@@ -8,8 +8,8 @@ exports.seed = async function(knex) {
   await knex('Orders').insert([
     {
       order_id: 1,
-      user_id: null,
-      order_date: null,
+      user_id: 1,
+      order_date: "2023-09-08",
       payment_method: 'credit_card',
       shipping_method: 'standard',
       billing_address_id: 1,
@@ -18,8 +18,8 @@ exports.seed = async function(knex) {
     },
     {
       order_id: 2,
-      user_id: 27,
-      order_date: null,
+      user_id: 3,
+      order_date: "2023-09-10",
       payment_method: 'credit_card',
       shipping_method: 'standard',
       billing_address_id: 3,
