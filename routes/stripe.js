@@ -17,7 +17,7 @@ router.get('/payment/success', async (req, res) => {
         .where({ order_id: order_id })
         .update({ order_status: 1 })
         .then(() => {
-            res.redirect(302, `http://localhost:3000/thankyou?payment=success&orderid=${order_id}`)
+            res.redirect(302, `${process.env.FRONTEND_URL}/thankyou?payment=success&orderid=${order_id}`)
         })
         .catch((err) => {
             res.status(500).send(`Error updating order status with id:${order_id}`);
